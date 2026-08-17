@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Skill Observatory report</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 2rem; line-height: 1.4; }
+    h1 { font-size: 1.4rem; font-weight: 600; margin: 0 0 0.25rem; }
+    .meta { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    h2 { font-size: 1.05rem; margin: 1.75rem 0 0.5rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 0.4rem 0.55rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    th { font-weight: 600; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .prompt { max-width: 28rem; color: #444; }
+  </style>
+</head>
+<body>
+  <h1>Skill Observatory</h1>
+  <p class="meta">Generated {{.GeneratedAt}} · {{.SkillCount}} installed skill files · {{len .Dead}} never invoked</p>
+
+  {{if .Hot}}
+  <h2>Hot skills</h2>
+  <table>
+    <thead>
+      <tr><th>Skill</th><th class="num">Invocations</th><th>Last seen</th><th>Trigger F1</th><th>Quality win</th><th>Sample prompt</th></tr>
+    </thead>
+    <tbody>
+      {{range .Hot}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td class="num">{{.Invocations}}</td>
+        <td>{{.LastSeen}}</td>
+        <td class="num">{{pct .TriggerF1}}</td>
+        <td class="num">{{pct .QualityWinRate}}</td>
+        <td class="prompt">{{.SamplePrompt}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  {{end}}
+
+  {{if .Dead}}
+  <h2>Dead skills (installed, never invoked)</h2>
+  <table>
+    <thead>
+      <tr><th>Skill</th><th>Source</th><th>Flags</th></tr>
+    </thead>
+    <tbody>
+      {{range .Dead}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td>{{.Source}}</td>
+        <td>{{join .Flags ", "}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  {{end}}
+
+  <h2>All skills</h2>
+  <table>
+    <thead>
+      <tr><th>Skill</th><th>Source</th><th class="num">Copies</th><th class="num">Invocations</th><th>Trigger F1</th><th>Quality win</th></tr>
+    </thead>
+    <tbody>
+      {{range .Skills}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td>{{.Source}}</td>
+        <td class="num">{{.Copies}}</td>
+        <td class="num">{{.Invocations}}</td>
+        <td class="num">{{pct .TriggerF1}}</td>
+        <td class="num">{{pct .QualityWinRate}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</body>
+</html>

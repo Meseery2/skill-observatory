@@ -1,0 +1,25 @@
+{
+  "skill_name": "resume-ats-optimizer",
+  "evals": [
+    {
+      "id": "bullet-rewrite",
+      "prompt": "Rewrite this resume bullet for ATS and a Senior Backend Engineer role at a fintech: 'Worked on backend systems and helped the team.'",
+      "expected_output": "A stronger bullet with an action verb, a concrete system or domain, and a measurable outcome if plausible.",
+      "assertions": [
+        "Uses a strong action verb rather than 'worked on'",
+        "Mentions backend, APIs, or a similar technical keyword",
+        "Includes a metric or concrete outcome, or explicitly notes that a metric is missing"
+      ]
+    },
+    {
+      "id": "format-advice",
+      "prompt": "My resume uses a two-column table and icons for contact info. I'm applying through Workday. What should I change for ATS?",
+      "expected_output": "Warns that tables/icons break parsers and recommends a single-column, text-selectable layout.",
+      "assertions": [
+        "Flags tables or multi-column layouts as an ATS risk",
+        "Recommends a simpler single-column or plain-text-friendly format",
+        "Mentions applicant tracking systems or parsers"
+      ]
+    }
+  ]
+}

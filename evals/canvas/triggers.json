@@ -1,0 +1,18 @@
+[
+  {"id": "pos-compare", "query": "I need a side-by-side comparison of three MBA programs with costs and rankings.", "should_trigger": true},
+  {"id": "pos-table", "query": "Don't dump this as a markdown table — I want something I can open beside the chat.", "should_trigger": true},
+  {"id": "pos-billing", "query": "Pull usage from the last 7 days and show a quantitative billing breakdown I can explore.", "should_trigger": true},
+  {"id": "pos-canvas-file", "query": "Create a .canvas.tsx for this architecture review.", "should_trigger": true},
+  {"id": "pos-metrics", "query": "Visualize error rate by service from this Datadog export as a standalone artifact.", "should_trigger": true},
+  {"id": "pos-timeline", "query": "Build an interactive timeline of the incident from these logs.", "should_trigger": true},
+  {"id": "pos-audit", "query": "Turn this security audit into a structured visual report next to the conversation.", "should_trigger": true},
+  {"id": "pos-edit", "query": "The canvas you wrote is blank — debug the .canvas.tsx file.", "should_trigger": true},
+  {"id": "neg-pr", "query": "Draft a GitHub pull request description for this diff.", "should_trigger": false},
+  {"id": "neg-fix", "query": "Fix the nil pointer in campaign_handlers.go.", "should_trigger": false},
+  {"id": "neg-resume", "query": "Optimize my resume for ATS keyword match.", "should_trigger": false},
+  {"id": "neg-datadog", "query": "Create a Datadog dashboard for API latency.", "should_trigger": false, "notes": "user asked for the real tool"},
+  {"id": "neg-go-errors", "query": "Wrap this os.Open error idiomatically in Go.", "should_trigger": false},
+  {"id": "neg-email", "query": "Write a support reply to this customer using the Stripe invoice data.", "should_trigger": false},
+  {"id": "neg-rule", "query": "Add a Cursor rule that always applies TypeScript strictness.", "should_trigger": false},
+  {"id": "neg-generic", "query": "What time is it in Tokyo?", "should_trigger": false}
+]

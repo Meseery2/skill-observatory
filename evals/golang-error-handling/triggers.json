@@ -1,0 +1,18 @@
+[
+  {"id": "pos-wrap", "query": "How should I wrap the error from os.Open in this Go helper?", "should_trigger": true, "notes": "explicit wrap request"},
+  {"id": "pos-ignore", "query": "Is it okay to assign this err to underscore in Go?", "should_trigger": true},
+  {"id": "pos-sentinel", "query": "Should I use errors.Is or == when checking sql.ErrNoRows?", "should_trigger": true},
+  {"id": "pos-panic", "query": "A teammate wants to panic if the config file is missing. What's the idiomatic Go approach?", "should_trigger": true},
+  {"id": "pos-slog", "query": "Where should I log this error versus just returning it in our Go service?", "should_trigger": true},
+  {"id": "pos-join", "query": "I have two independent failures while closing resources in Go. How do I combine them?", "should_trigger": true},
+  {"id": "pos-http", "query": "Don't leak internal error strings to the HTTP client in this Go handler.", "should_trigger": true},
+  {"id": "pos-custom", "query": "I need a custom error type that carries a request id in Go.", "should_trigger": true},
+  {"id": "neg-test", "query": "Write a table-driven test for this parser using testify.", "should_trigger": false, "notes": "testing skill"},
+  {"id": "neg-cobra", "query": "Add a cobra subcommand with PersistentPreRunE for config init.", "should_trigger": false},
+  {"id": "neg-sql", "query": "Use a parameterized query with database/sql to look up a user by email.", "should_trigger": false},
+  {"id": "neg-concurrency", "query": "This goroutine leaks because the channel is never closed. Fix the concurrency.", "should_trigger": false},
+  {"id": "neg-resume", "query": "Rewrite my resume bullet about error handling for ATS.", "should_trigger": false},
+  {"id": "neg-canvas", "query": "Build a canvas comparing error rates across services.", "should_trigger": false},
+  {"id": "neg-lint", "query": "What golangci-lint linters should we enable for this repo?", "should_trigger": false},
+  {"id": "neg-generic", "query": "Explain how TCP handshake works.", "should_trigger": false}
+]

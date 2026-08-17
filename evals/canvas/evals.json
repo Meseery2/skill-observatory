@@ -1,0 +1,24 @@
+{
+  "skill_name": "canvas",
+  "evals": [
+    {
+      "id": "should-use",
+      "prompt": "I want to compare three MBA programs on cost, ranking, and career outcomes. How should you present that in Cursor?",
+      "expected_output": "Recommends a Cursor canvas (.canvas.tsx) rather than a markdown table, and mentions opening it beside the chat.",
+      "assertions": [
+        "Recommends a canvas rather than a markdown table as the primary deliverable",
+        "Mentions a .canvas.tsx file or the canvases directory",
+        "Says the user can open it beside the chat"
+      ]
+    },
+    {
+      "id": "should-skip",
+      "prompt": "Fix the failing unit test in internal/store/store_test.go. Don't create extra artifacts.",
+      "expected_output": "Does not recommend a canvas; treats this as a targeted code fix.",
+      "assertions": [
+        "Does not instruct creating a .canvas.tsx file",
+        "Treats the request as a code fix, not a standalone analytical artifact"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+[
+  {"id": "pos-ats", "query": "Optimize this resume so it gets past ATS keyword screening.", "should_trigger": true},
+  {"id": "pos-no-interviews", "query": "I'm applying to jobs and not getting interviews. Can you check if my resume is ATS-friendly?", "should_trigger": true},
+  {"id": "pos-keywords", "query": "Compare my resume against this job description and tell me which keywords I'm missing.", "should_trigger": true},
+  {"id": "pos-parse", "query": "Will an applicant tracking system choke on the tables in my resume PDF?", "should_trigger": true},
+  {"id": "pos-score", "query": "Give me an ATS match score for this resume and the HelloFresh EM posting.", "should_trigger": true},
+  {"id": "pos-format", "query": "What resume formatting breaks Workday parsers?", "should_trigger": true},
+  {"id": "pos-file", "query": "I attached my resume — I'm applying to backend roles and keep getting auto-rejected.", "should_trigger": true},
+  {"id": "pos-compat", "query": "Check ATS compatibility of this CV before I submit it.", "should_trigger": true},
+  {"id": "neg-cover", "query": "Write a cover letter for this engineering manager role.", "should_trigger": false, "notes": "cover-letter-generator"},
+  {"id": "neg-linkedin", "query": "Rewrite my LinkedIn About section to sound more senior.", "should_trigger": false},
+  {"id": "neg-interview", "query": "Generate STAR stories for my upcoming onsite interview.", "should_trigger": false},
+  {"id": "neg-salary", "query": "Help me negotiate a 180k offer against this competing bid.", "should_trigger": false},
+  {"id": "neg-go-errors", "query": "How do I wrap errors with %w in Go?", "should_trigger": false},
+  {"id": "neg-canvas", "query": "Make a canvas comparing three MBA programs.", "should_trigger": false},
+  {"id": "neg-tailor", "query": "Reorder my resume sections for a career change into product design — not ATS parsing.", "should_trigger": false},
+  {"id": "neg-generic", "query": "What's the weather in Berlin this weekend?", "should_trigger": false}
+]

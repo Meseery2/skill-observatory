@@ -1,0 +1,9 @@
+llm:
+  provider: openai   # openai | anthropic | openai-compatible
+  base_url: ""
+  model: gpt-4.1
+  api_key_env: OPENAI_API_KEY
+transcripts_root: ~/.cursor/projects
+db: ~/.local/share/skill-observatory/observatory.db
+evals_dir: evals
+format: table

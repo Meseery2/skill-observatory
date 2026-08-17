@@ -1,0 +1,15 @@
+/bin/
+/dist/
+*.db
+*.db-wal
+*.db-shm
+reports/
+.env
+.env.*
+.idea/
+.vscode/
+*.exe
+*.test
+*.out
+coverage.out
+vendor/

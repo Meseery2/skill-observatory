@@ -1,0 +1,26 @@
+{
+  "skill_name": "golang-error-handling",
+  "evals": [
+    {
+      "id": "open-file",
+      "prompt": "Write a Go function ReadConfig(path string) ([]byte, error) that reads a file. Show idiomatic error handling only — no extra features.",
+      "expected_output": "A function that returns error, wraps with %w, and does not panic or ignore err.",
+      "assertions": [
+        "Returns an error as the last result",
+        "Wraps the underlying error with %w",
+        "Does not call panic",
+        "Does not assign the error to underscore"
+      ]
+    },
+    {
+      "id": "http-boundary",
+      "prompt": "Show a tiny Go HTTP handler that fails to load a user. How should it treat the error at the HTTP boundary?",
+      "expected_output": "Logs or returns internally, sends a generic client message, does not expose raw err.Error() to the user.",
+      "assertions": [
+        "Does not write the raw internal error string to the HTTP response",
+        "Mentions logging or returning the error once, not both",
+        "Uses a generic client-facing message"
+      ]
+    }
+  ]
+}

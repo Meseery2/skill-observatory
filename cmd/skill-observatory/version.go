@@ -1,0 +1,29 @@
+package main
+
+import (
+	"fmt"
+	"runtime/debug"
+
+	"github.com/spf13/cobra"
+)
+
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
+func newVersionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "Print version information",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Fprintf(cmd.OutOrStdout(), "skill-observatory %s (commit: %s, built: %s)\n", version, commit, date)
+			if info, ok := debug.ReadBuildInfo(); ok {
+				fmt.Fprintf(cmd.OutOrStdout(), "go: %s\n", info.GoVersion)
+			}
+			return nil
+		},
+	}
+}
