@@ -41,6 +41,31 @@ skill-observatory report
 
 Seed fixtures live in `evals/` for `golang-error-handling`, `resume-ats-optimizer`, and `canvas`.
 
+## How an LLM invokes a skill
+
+Cursor does not run a separate router. At boot it injects every skill's **name + description**. The model then decides whether to read `SKILL.md`, or you force that with `/skill-name`.
+
+```mermaid
+flowchart TD
+  userPrompt[User prompt]
+  catalog[Skill catalog: name plus description]
+  decide{Model: is a skill relevant?}
+  slash["User typed /skill-name"]
+  readSkill[Read SKILL.md]
+  refs[Load references or scripts if needed]
+  answer[Produce output]
+  skip[Answer without a skill]
+
+  userPrompt --> catalog
+  catalog --> decide
+  slash --> readSkill
+  decide -->|yes| readSkill
+  decide -->|no| skip
+  readSkill --> refs
+  refs --> answer
+  skip --> answer
+```
+
 ## How measurement works
 
 Cursor only injects skill **name + description**. The model then **reads `SKILL.md`** (or you attach the skill with `/`).
