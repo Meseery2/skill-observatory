@@ -11,7 +11,16 @@ It answers:
 ## Install
 
 ```bash
+make install
+```
+
+That builds the binary and copies it to `~/.local/bin/skill-observatory` (override with `PREFIX`). Confirm with `skill-observatory version`.
+
+To run from the repo without installing:
+
+```bash
 go build -o bin/skill-observatory ./cmd/skill-observatory
+./bin/skill-observatory discover
 ```
 
 Optional config: `~/.config/skill-observatory/config.yaml` (see `config.example.yaml`). Set `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` for evals.
