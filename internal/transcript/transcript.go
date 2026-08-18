@@ -3,6 +3,7 @@ package transcript
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -82,12 +83,12 @@ func ScanRoot(root string) ([]store.Invocation, error) {
 	return events, nil
 }
 
-func ParseFile(path string) ([]store.Invocation, error) {
+func ParseFile(path string) (events []store.Invocation, err error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("opening transcript %s: %w", path, err)
 	}
-	defer f.Close()
+	defer func() { err = errors.Join(err, f.Close()) }()
 
 	info, err := f.Stat()
 	if err != nil {
@@ -95,7 +96,7 @@ func ParseFile(path string) ([]store.Invocation, error) {
 	}
 	invokedAt := info.ModTime().UTC().Format(time.RFC3339)
 	project, conversationID := locate(path)
-	events, err := parse(f, path, project, conversationID, invokedAt)
+	events, err = parse(f, path, project, conversationID, invokedAt)
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s: %w", path, err)
 	}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/meseery/skill-observatory/internal/discover"
@@ -13,7 +12,7 @@ func newDiscoverCmd() *cobra.Command {
 		Use:   "discover",
 		Short: "Scan skill directories and upsert the inventory",
 		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			ctx := cmd.Context()
 			res, err := scanSkills()
 			if err != nil {
@@ -23,7 +22,7 @@ func newDiscoverCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer st.Close()
+			defer closeErr(st, &err)
 			if err := st.ReplaceSkills(ctx, res.Skills); err != nil {
 				return err
 			}
@@ -44,9 +43,13 @@ func newDiscoverCmd() *cobra.Command {
 				return err
 			}
 			if len(res.Duplicates) > 0 && outputFormat() == "table" {
-				fmt.Fprintln(cmd.ErrOrStderr(), "name collisions:")
+				if err := writeErrln(cmd, "name collisions:"); err != nil {
+					return err
+				}
 				for _, d := range res.Duplicates {
-					fmt.Fprintf(cmd.ErrOrStderr(), "  %s (%d copies)\n", d.Name, len(d.Paths))
+					if err := writeErrf(cmd, "  %s (%d copies)\n", d.Name, len(d.Paths)); err != nil {
+						return err
+					}
 				}
 			}
 			return nil

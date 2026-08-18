@@ -28,11 +28,25 @@ func writeJSON(w io.Writer, v any) error {
 
 func writeTable(w io.Writer, headers []string, rows [][]string) error {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, strings.Join(headers, "\t"))
+	if _, err := fmt.Fprintln(tw, strings.Join(headers, "\t")); err != nil {
+		return err
+	}
 	for _, row := range rows {
-		fmt.Fprintln(tw, strings.Join(row, "\t"))
+		if _, err := fmt.Fprintln(tw, strings.Join(row, "\t")); err != nil {
+			return err
+		}
 	}
 	return tw.Flush()
+}
+
+func writeErrln(cmd *cobra.Command, a ...any) error {
+	_, err := fmt.Fprintln(cmd.ErrOrStderr(), a...)
+	return err
+}
+
+func writeErrf(cmd *cobra.Command, format string, a ...any) error {
+	_, err := fmt.Fprintf(cmd.ErrOrStderr(), format, a...)
+	return err
 }
 
 func writeOutput(cmd *cobra.Command, v any, headers []string, rows [][]string) error {

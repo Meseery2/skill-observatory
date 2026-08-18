@@ -1,0 +1,3 @@
+[
+  {"id": "pos-1", "query": "wrap this error", "should_trigger": true}
+]

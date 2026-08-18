@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,13 +31,11 @@ func Open(path string) (*Store, error) {
 	}
 	db.SetMaxOpenConns(1)
 	if _, err := db.Exec(`PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;`); err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("pragma: %w", err)
+		return nil, errors.Join(fmt.Errorf("pragma: %w", err), db.Close())
 	}
 	s := &Store{db: db}
 	if err := s.migrate(); err != nil {
-		_ = db.Close()
-		return nil, err
+		return nil, errors.Join(err, db.Close())
 	}
 	return s, nil
 }
@@ -45,6 +45,10 @@ func (s *Store) Close() error {
 		return nil
 	}
 	return s.db.Close()
+}
+
+func closeErr(c io.Closer, errp *error) {
+	*errp = errors.Join(*errp, c.Close())
 }
 
 func (s *Store) migrate() error {
@@ -127,7 +131,7 @@ func (s *Store) migrateInvocationsUnique() error {
 	return nil
 }
 
-func (s *Store) ReplaceSkills(ctx context.Context, skills []skill.Skill) error {
+func (s *Store) ReplaceSkills(ctx context.Context, skills []skill.Skill) (err error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin: %w", err)
@@ -146,7 +150,7 @@ INSERT INTO skills (
 	if err != nil {
 		return fmt.Errorf("prepare insert skill: %w", err)
 	}
-	defer stmt.Close()
+	defer closeErr(stmt, &err)
 
 	for _, sk := range skills {
 		flags, err := json.Marshal(sk.Flags)
@@ -179,7 +183,7 @@ INSERT INTO skills (
 	return nil
 }
 
-func (s *Store) ListSkills(ctx context.Context) ([]skill.Skill, error) {
+func (s *Store) ListSkills(ctx context.Context) (out []skill.Skill, err error) {
 	rows, err := s.db.QueryContext(ctx, `
 SELECT name, description, path, source, disable_model_invocation,
        description_chars, body_lines, content_hash, flags
@@ -187,9 +191,7 @@ FROM skills ORDER BY name, path`)
 	if err != nil {
 		return nil, fmt.Errorf("listing skills: %w", err)
 	}
-	defer rows.Close()
-
-	var out []skill.Skill
+	defer closeErr(rows, &err)
 	for rows.Next() {
 		var sk skill.Skill
 		var source string
@@ -234,7 +236,7 @@ type Invocation struct {
 	InvokedAt       string `json:"invoked_at"`
 }
 
-func (s *Store) ReplaceInvocations(ctx context.Context, events []Invocation) error {
+func (s *Store) ReplaceInvocations(ctx context.Context, events []Invocation) (err error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin: %w", err)
@@ -253,7 +255,7 @@ INSERT INTO invocations (
 	if err != nil {
 		return fmt.Errorf("prepare insert invocation: %w", err)
 	}
-	defer stmt.Close()
+	defer closeErr(stmt, &err)
 
 	for _, e := range events {
 		trunc := 0
@@ -306,7 +308,7 @@ type InvocationFilter struct {
 	Since   time.Time
 }
 
-func (s *Store) ListInvocations(ctx context.Context, f InvocationFilter) ([]Invocation, error) {
+func (s *Store) ListInvocations(ctx context.Context, f InvocationFilter) (out []Invocation, err error) {
 	q := `
 SELECT conversation_id, project, transcript_path, turn_index, prompt, prompt_truncated,
        skill_name, skill_path, kind, invoked_at
@@ -330,9 +332,8 @@ FROM invocations WHERE 1=1`
 	if err != nil {
 		return nil, fmt.Errorf("listing invocations: %w", err)
 	}
-	defer rows.Close()
+	defer closeErr(rows, &err)
 
-	var out []Invocation
 	for rows.Next() {
 		var e Invocation
 		var trunc int
@@ -367,7 +368,7 @@ type EvalRun struct {
 	SummaryJSON string
 }
 
-func (s *Store) InsertEvalRun(ctx context.Context, run EvalRun, results []EvalResult) (int64, error) {
+func (s *Store) InsertEvalRun(ctx context.Context, run EvalRun, results []EvalResult) (id int64, err error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return 0, fmt.Errorf("begin: %w", err)
@@ -382,7 +383,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?)`,
 	if err != nil {
 		return 0, fmt.Errorf("inserting eval run: %w", err)
 	}
-	id, err := res.LastInsertId()
+	id, err = res.LastInsertId()
 	if err != nil {
 		return 0, fmt.Errorf("eval run id: %w", err)
 	}
@@ -391,7 +392,7 @@ INSERT INTO eval_results (run_id, case_id, repetition, payload_json) VALUES (?, 
 	if err != nil {
 		return 0, fmt.Errorf("prepare eval result: %w", err)
 	}
-	defer stmt.Close()
+	defer closeErr(stmt, &err)
 	for _, r := range results {
 		if _, err := stmt.ExecContext(ctx, id, r.CaseID, r.Repetition, r.PayloadJSON); err != nil {
 			return 0, fmt.Errorf("inserting eval result: %w", err)
@@ -409,7 +410,7 @@ type EvalResult struct {
 	PayloadJSON string
 }
 
-func (s *Store) LatestEvalRuns(ctx context.Context) ([]EvalRun, error) {
+func (s *Store) LatestEvalRuns(ctx context.Context) (out []EvalRun, err error) {
 	rows, err := s.db.QueryContext(ctx, `
 SELECT id, kind, skill_name, catalog_mode, model, started_at, finished_at, summary_json
 FROM eval_runs e
@@ -424,9 +425,8 @@ ORDER BY skill_name, kind`)
 	if err != nil {
 		return nil, fmt.Errorf("listing eval runs: %w", err)
 	}
-	defer rows.Close()
+	defer closeErr(rows, &err)
 
-	var out []EvalRun
 	for rows.Next() {
 		var r EvalRun
 		var mode sql.NullString

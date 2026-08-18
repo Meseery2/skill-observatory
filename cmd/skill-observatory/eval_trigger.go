@@ -18,7 +18,7 @@ func newEvalTriggerCmd() *cobra.Command {
 		Use:   "trigger [NAME]",
 		Short: "Score whether a skill description fires on the right prompts",
 		Args:  cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			ctx := cmd.Context()
 			mode, _ := cmd.Flags().GetString("catalog-mode")
 			repeats, _ := cmd.Flags().GetInt("repeats")
@@ -27,7 +27,7 @@ func newEvalTriggerCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer st.Close()
+			defer closeErr(st, &err)
 			skills, err := loadInventory(ctx, st)
 			if err != nil {
 				return err
@@ -60,7 +60,9 @@ func newEvalTriggerCmd() *cobra.Command {
 					return err
 				}
 				if !sk.AutoInvocable() {
-					fmt.Fprintf(cmd.ErrOrStderr(), "skipping %s: disable-model-invocation\n", name)
+					if err := writeErrf(cmd, "skipping %s: disable-model-invocation\n", name); err != nil {
+						return err
+					}
 					continue
 				}
 				cases, err := trigger.LoadCases(evalsDir(), name)

@@ -18,13 +18,13 @@ func newEvalQualityCmd() *cobra.Command {
 		Use:   "quality [NAME]",
 		Short: "Compare with-skill vs without-skill completions",
 		Args:  cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			ctx := cmd.Context()
 			st, err := openStore()
 			if err != nil {
 				return err
 			}
-			defer st.Close()
+			defer closeErr(st, &err)
 			skills, err := loadInventory(ctx, st)
 			if err != nil {
 				return err

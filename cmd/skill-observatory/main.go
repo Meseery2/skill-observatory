@@ -17,7 +17,9 @@ func main() {
 
 	cmd := NewRootCmd()
 	if err := cmd.ExecuteContext(ctx); err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		if _, werr := fmt.Fprintln(os.Stderr, err.Error()); werr != nil {
+			os.Exit(1)
+		}
 		var exitErr *clierr.ExitError
 		if errors.As(err, &exitErr) {
 			os.Exit(exitErr.Code)

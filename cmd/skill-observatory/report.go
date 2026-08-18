@@ -17,14 +17,14 @@ func newReportCmd() *cobra.Command {
 		Use:   "report",
 		Short: "Join inventory, invocation log, and latest evals",
 		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			ctx := cmd.Context()
 			outDir, _ := cmd.Flags().GetString("out")
 			st, err := openStore()
 			if err != nil {
 				return err
 			}
-			defer st.Close()
+			defer closeErr(st, &err)
 
 			skills, err := loadInventory(ctx, st)
 			if err != nil {
@@ -53,7 +53,9 @@ func newReportCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "wrote %s\n", htmlPath)
+			if err := writeErrf(cmd, "wrote %s\n", htmlPath); err != nil {
+				return err
+			}
 
 			var table [][]string
 			for _, row := range rep.Skills {

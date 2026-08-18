@@ -48,7 +48,7 @@ func TestRun_usesRouterJSON(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, 1, got.Metrics.TP)
-	require.Equal(t, 1.0, got.Metrics.Recall)
+	require.InDelta(t, 1.0, got.Metrics.Recall, 1e-9)
 }
 
 func TestRun_rejectsSlashOnly(t *testing.T) {
@@ -59,4 +59,24 @@ func TestRun_rejectsSlashOnly(t *testing.T) {
 		Client: &llm.Scripted{},
 	})
 	require.Error(t, err)
+}
+
+func TestLoadCases(t *testing.T) {
+	t.Parallel()
+
+	cases, err := LoadCases("testdata", "demo")
+	require.NoError(t, err)
+	require.Equal(t, "pos-1", cases[0].ID)
+	require.True(t, cases[0].ShouldTrigger)
+}
+
+func TestCatalogFrom_skipsSlashOnly(t *testing.T) {
+	t.Parallel()
+
+	got := CatalogFrom([]skill.Skill{
+		{Name: "a", Description: "auto", DisableModelInvocation: false},
+		{Name: "b", Description: "slash", DisableModelInvocation: true},
+	}, true)
+	require.Len(t, got, 1)
+	require.Equal(t, "a", got[0].Name)
 }

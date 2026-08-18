@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,6 +25,10 @@ func openStore() (*store.Store, error) {
 		return nil, fmt.Errorf("opening database: %w", err)
 	}
 	return s, nil
+}
+
+func closeErr(c io.Closer, errp *error) {
+	*errp = errors.Join(*errp, c.Close())
 }
 
 func scanSkills() (discover.Result, error) {

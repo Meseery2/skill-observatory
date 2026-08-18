@@ -20,7 +20,7 @@ func newLogCmd() *cobra.Command {
 		Use:   "log",
 		Short: "Show skill invocations mined from Cursor transcripts",
 		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			ctx := cmd.Context()
 			skillName, _ := cmd.Flags().GetString("skill")
 			project, _ := cmd.Flags().GetString("project-filter")
@@ -31,7 +31,7 @@ func newLogCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer st.Close()
+			defer closeErr(st, &err)
 
 			if refresh || mustRefreshInvocations(ctx, st) {
 				root := fsutil.ExpandHome(viper.GetString("transcripts_root"))
@@ -42,7 +42,9 @@ func newLogCmd() *cobra.Command {
 				if err := st.ReplaceInvocations(ctx, events); err != nil {
 					return err
 				}
-				fmt.Fprintf(cmd.ErrOrStderr(), "indexed %d invocation events from %s\n", len(events), root)
+				if err := writeErrf(cmd, "indexed %d invocation events from %s\n", len(events), root); err != nil {
+					return err
+				}
 			}
 
 			var since time.Time

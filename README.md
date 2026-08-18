@@ -41,6 +41,19 @@ skill-observatory report
 
 Seed fixtures live in `evals/` for `golang-error-handling`, `resume-ats-optimizer`, and `canvas`.
 
+## Tests and CI
+
+```bash
+make test
+make test-race
+make lint
+```
+
+GitHub Actions runs the same suite on every push and pull request to `main`:
+
+- **Tests** — `go test -race -shuffle=on` on Go 1.26 and stable, plus `go mod tidy`
+- **Lint** — `go vet` and golangci-lint
+
 ## How an LLM invokes a skill
 
 Cursor does not run a separate router. At boot it injects every skill's **name + description**. The model then decides whether to read `SKILL.md`, or you force that with `/skill-name`.
