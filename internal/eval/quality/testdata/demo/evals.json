@@ -1,0 +1,11 @@
+{
+  "skill_name": "demo",
+  "evals": [
+    {
+      "id": "q1",
+      "prompt": "do the thing",
+      "expected_output": "a numbered list",
+      "assertions": ["numbered steps"]
+    }
+  ]
+}

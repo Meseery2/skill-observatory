@@ -1,6 +1,7 @@
 package report
 
 import (
+	"os"
 	"testing"
 
 	"github.com/meseery/skill-observatory/internal/skill"
@@ -31,4 +32,15 @@ func TestBuild_deadAndHot(t *testing.T) {
 	require.InDelta(t, f1, *got.Hot[0].TriggerF1, 1e-9)
 	require.Equal(t, 1, len(got.Dead))
 	require.Equal(t, "unused", got.Dead[0].Name)
+}
+
+func TestWriteHTML(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	path, err := WriteHTML(Build(nil, nil, nil), dir)
+	require.NoError(t, err)
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Contains(t, string(data), "Skill Observatory")
 }

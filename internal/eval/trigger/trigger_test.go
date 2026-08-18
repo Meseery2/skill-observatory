@@ -60,3 +60,23 @@ func TestRun_rejectsSlashOnly(t *testing.T) {
 	})
 	require.Error(t, err)
 }
+
+func TestLoadCases(t *testing.T) {
+	t.Parallel()
+
+	cases, err := LoadCases("testdata", "demo")
+	require.NoError(t, err)
+	require.Equal(t, "pos-1", cases[0].ID)
+	require.True(t, cases[0].ShouldTrigger)
+}
+
+func TestCatalogFrom_skipsSlashOnly(t *testing.T) {
+	t.Parallel()
+
+	got := CatalogFrom([]skill.Skill{
+		{Name: "a", Description: "auto", DisableModelInvocation: false},
+		{Name: "b", Description: "slash", DisableModelInvocation: true},
+	}, true)
+	require.Len(t, got, 1)
+	require.Equal(t, "a", got[0].Name)
+}

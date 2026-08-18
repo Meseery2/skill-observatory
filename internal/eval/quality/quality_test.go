@@ -54,3 +54,15 @@ func TestRun_blindJudgeMapsWinner(t *testing.T) {
 	require.Contains(t, []string{"with", "without"}, got.Pairs[0].Winner)
 	require.NotEmpty(t, got.Pairs[0].Reason)
 }
+
+func TestLoadCases_objectAndMissing(t *testing.T) {
+	t.Parallel()
+
+	cases, err := LoadCases("testdata", "demo")
+	require.NoError(t, err)
+	require.Equal(t, "q1", cases[0].ID)
+	require.Equal(t, []string{"numbered steps"}, cases[0].Assertions)
+
+	_, err = LoadCases("testdata", "missing")
+	require.Error(t, err)
+}
