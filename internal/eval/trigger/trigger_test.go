@@ -48,7 +48,7 @@ func TestRun_usesRouterJSON(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, 1, got.Metrics.TP)
-	require.Equal(t, 1.0, got.Metrics.Recall)
+	require.InDelta(t, 1.0, got.Metrics.Recall, 1e-9)
 }
 
 func TestRun_rejectsSlashOnly(t *testing.T) {

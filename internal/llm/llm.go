@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -85,7 +86,7 @@ type openAIClient struct {
 	baseURL string
 }
 
-func (c *openAIClient) Complete(ctx context.Context, req Request) (Response, error) {
+func (c *openAIClient) Complete(ctx context.Context, req Request) (_ Response, err error) {
 	maxTok := req.MaxTokens
 	if maxTok == 0 {
 		maxTok = 2048
@@ -113,17 +114,17 @@ func (c *openAIClient) Complete(ctx context.Context, req Request) (Response, err
 	}
 	httpReq.Header.Set("Authorization", "Bearer "+c.key)
 	httpReq.Header.Set("Content-Type", "application/json")
-	resp, err := c.http.Do(httpReq)
+	httpResp, err := c.http.Do(httpReq)
 	if err != nil {
 		return Response{}, fmt.Errorf("openai request: %w", err)
 	}
-	defer resp.Body.Close()
-	payload, err := io.ReadAll(resp.Body)
+	defer func() { err = errors.Join(err, httpResp.Body.Close()) }()
+	payload, err := io.ReadAll(httpResp.Body)
 	if err != nil {
 		return Response{}, fmt.Errorf("reading openai response: %w", err)
 	}
-	if resp.StatusCode >= 300 {
-		return Response{}, fmt.Errorf("openai status %d: %s", resp.StatusCode, truncate(string(payload), 400))
+	if httpResp.StatusCode >= 300 {
+		return Response{}, fmt.Errorf("openai status %d: %s", httpResp.StatusCode, truncate(string(payload), 400))
 	}
 	var parsed struct {
 		Choices []struct {
@@ -158,7 +159,7 @@ type anthropicClient struct {
 	baseURL string
 }
 
-func (c *anthropicClient) Complete(ctx context.Context, req Request) (Response, error) {
+func (c *anthropicClient) Complete(ctx context.Context, req Request) (_ Response, err error) {
 	maxTok := req.MaxTokens
 	if maxTok == 0 {
 		maxTok = 2048
@@ -193,17 +194,17 @@ func (c *anthropicClient) Complete(ctx context.Context, req Request) (Response, 
 	httpReq.Header.Set("x-api-key", c.key)
 	httpReq.Header.Set("anthropic-version", "2023-06-01")
 	httpReq.Header.Set("Content-Type", "application/json")
-	resp, err := c.http.Do(httpReq)
+	httpResp, err := c.http.Do(httpReq)
 	if err != nil {
 		return Response{}, fmt.Errorf("anthropic request: %w", err)
 	}
-	defer resp.Body.Close()
-	payload, err := io.ReadAll(resp.Body)
+	defer func() { err = errors.Join(err, httpResp.Body.Close()) }()
+	payload, err := io.ReadAll(httpResp.Body)
 	if err != nil {
 		return Response{}, fmt.Errorf("reading anthropic response: %w", err)
 	}
-	if resp.StatusCode >= 300 {
-		return Response{}, fmt.Errorf("anthropic status %d: %s", resp.StatusCode, truncate(string(payload), 400))
+	if httpResp.StatusCode >= 300 {
+		return Response{}, fmt.Errorf("anthropic status %d: %s", httpResp.StatusCode, truncate(string(payload), 400))
 	}
 	var parsed struct {
 		Content []struct {

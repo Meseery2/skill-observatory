@@ -19,9 +19,13 @@ func newVersionCmd() *cobra.Command {
 		Short: "Print version information",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintf(cmd.OutOrStdout(), "skill-observatory %s (commit: %s, built: %s)\n", version, commit, date)
+			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "skill-observatory %s (commit: %s, built: %s)\n", version, commit, date); err != nil {
+				return err
+			}
 			if info, ok := debug.ReadBuildInfo(); ok {
-				fmt.Fprintf(cmd.OutOrStdout(), "go: %s\n", info.GoVersion)
+				if _, err := fmt.Fprintf(cmd.OutOrStdout(), "go: %s\n", info.GoVersion); err != nil {
+					return err
+				}
 			}
 			return nil
 		},

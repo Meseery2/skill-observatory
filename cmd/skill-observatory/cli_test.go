@@ -47,7 +47,7 @@ description: Use when running the demo skill in tests.
 	require.NoError(t, err)
 	var discovered map[string]any
 	require.NoError(t, json.Unmarshal([]byte(out), &discovered))
-	require.Equal(t, float64(1), discovered["count"])
+	require.InDelta(t, 1, discovered["count"], 1e-9)
 
 	out, err = execCLI(t, "inventory", "--db", db, "--format", "json")
 	require.NoError(t, err)
